@@ -8,7 +8,7 @@ local serverHopDelay = 25
 local PlaceId = game.PlaceId
 local JobId = game.JobId
 
-local WEBHOOK_URL = "https://discordapp.com/api/webhooks/1380694630106140854/rNvNZMpLgKzE2r8AyvqfU7RZpJEMfneC9M25Mvy8VgYqx83ZIb2EyYgj4vDogLNdhvky" -- Ganti dengan webhook kamu
+local WEBHOOK_URL = "https://discordapp.com/api/webhooks/1380694630106140854/rNvNZMpLgKzE2r8AyvqfU7RZpJEMfneC9M25Mvy8VgYqx83ZIb2EyYgj4vDogLNdhvky"
 
 local teamToJoin = "Pirates"
 
