@@ -8,6 +8,8 @@ local serverHopDelay = 25
 local PlaceId = game.PlaceId
 local JobId = game.JobId
 
+local WEBHOOK_URL = "https://discordapp.com/api/webhooks/1380694630106140854/rNvNZMpLgKzE2r8AyvqfU7RZpJEMfneC9M25Mvy8VgYqx83ZIb2EyYgj4vDogLNdhvky" -- Ganti dengan webhook kamu
+
 local teamToJoin = "Pirates"
 
 local function joinTeam(teamName)
@@ -70,6 +72,37 @@ local function farmChest()
     end
 end
 
+local function sendWebhook(fruitName, jobId)
+    local data = {
+        content = "Fruit detected: **"..fruitName.."**\nJob ID: "..jobId
+    }
+    local jsonData = HttpService:JSONEncode(data)
+    local req = syn and syn.request or http_request or http.request or request
+    if req then
+        req({
+            Url = WEBHOOK_URL,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = jsonData
+        })
+    end
+end
+
+local detectedFruits = {}
+
+local function detectFruits()
+    for _, v in pairs(game.Workspace:GetChildren()) do
+        if v.Name == "Fruit" or v.Name == "Fruits" or v.Name == "fruit" then
+            -- cek nama buah di child (misal v.Name atau atribut lain)
+            local fruitName = v:FindFirstChild("Name") and v.Name or "Unknown"
+            if not detectedFruits[v] then
+                detectedFruits[v] = true
+                sendWebhook(fruitName, JobId)
+            end
+        end
+    end
+end
+
 local function getServer()
     local servers = {}
     local req = syn and syn.request or http_request or http.request or request
@@ -112,6 +145,7 @@ spawn(function()
     while true do
         if autoFarm then
             pcall(farmChest)
+            pcall(detectFruits) -- deteksi buah jalan bersamaan farm chest
         end
         wait(1)
     end
