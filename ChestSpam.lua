@@ -43,7 +43,7 @@ Title.Parent = Frame
 Title.Text = "SCRbLx FARM CURENCY $$$"
 Title.Size = UDim2.new(1, 0, 0, 50)
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Title.BackgroundColor3 = Color3.fromRGB(90, 50, 20)
 Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 20
 
@@ -53,7 +53,7 @@ ChestFarmBtn.Text = "Auto Chest Farm: ON"
 ChestFarmBtn.Size = UDim2.new(0.9, 0, 0, 40)
 ChestFarmBtn.Position = UDim2.new(0.05, 0, 0, 60)
 ChestFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ChestFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+ChestFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 80, 0)
 ChestFarmBtn.Font = Enum.Font.SourceSansBold
 ChestFarmBtn.TextSize = 18
 
