@@ -3,7 +3,7 @@ local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
 local player = Players.LocalPlayer
 
-local chestFarmDelay = 0.2
+local chestFarmDelay = 0.5
 local serverHopDelay = 25
 local PlaceId = game.PlaceId
 local JobId = game.JobId
@@ -100,17 +100,17 @@ local function sendWebhook(fruitName, jobId)
                     {
                         name = "Spawned Fruit",
                         value = formattedFruitName,
-                        inline = false
+                        inline = true
                     },
                     {
                         name = "Server",
                         value = "Players: "..playerCount.."/12\nSea: "..seaName,
-                        inline = false
+                        inline = true
                     },
                     {
                         name = "Job Id",
                         value = jobId,
-                        inline = false
+                        inline = true
                     }
                 },
                 footer = {
