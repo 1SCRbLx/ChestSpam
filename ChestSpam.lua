@@ -27,7 +27,7 @@ local farmLoopRunning = false
 local hopLoopRunning = false
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "SCRbLxUI"
+ScreenGui.Name = "SCRbLx-Script"
 ScreenGui.Parent = game.CoreGui
 
 local Frame = Instance.new("Frame")
@@ -40,7 +40,7 @@ Frame.Draggable = true
 
 local Title = Instance.new("TextLabel")
 Title.Parent = Frame
-Title.Text = "SCRbLx Chest Farm + Server Hop"
+Title.Text = "SCRbLx FARM CURENCY $$$"
 Title.Size = UDim2.new(1, 0, 0, 50)
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
