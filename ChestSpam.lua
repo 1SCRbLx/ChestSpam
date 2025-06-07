@@ -42,7 +42,7 @@ Frame.Draggable = true
 
 local Title = Instance.new("TextLabel")
 Title.Parent = Frame
-Title.Text = "SCRbLx FARM CURENCY $$$"
+Title.Text = "SCRbLx-CHEST-CURENCY"
 Title.Size = UDim2.new(1, 0, 0, 50)
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.BackgroundColor3 = Color3.fromRGB(90, 50, 20)
