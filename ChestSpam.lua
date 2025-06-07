@@ -8,7 +8,7 @@ local serverHopDelay = 25
 local PlaceId = game.PlaceId
 local JobId = game.JobId
 
-local WEBHOOK_URL = "https://discordapp.com/api/webhooks/1380694630106140854/rNvNZMpLgKzE2r8AyvqfU7RZpJEMfneC9M25Mvy8VgYqx83ZIb2EyYgj4vDogLNdhvky"
+local WEBHOOK_URL = "https://discordapp.com/api/webhooks/1380694630106140854/rNvNZMpLgKzE2r8AyvqfU7RZpJEMfneC9M25Mvy8VgYqx83ZIb2EyYgj4vDogLNdhvky" -- Ganti dengan webhook kamu
 
 local teamToJoin = "Pirates"
 
@@ -88,14 +88,30 @@ local function sendWebhook(fruitName, jobId)
     end
 end
 
+local baseFruits = {
+    "Dragon","Kitsune","Yeti","Leopard","Gas","Venom","Spirit","Gravity","Dough",
+    "Shadow","Control","T-Rex","Mammoth","Blizzard","Pain","Rumble","Portal",
+    "Phoenix","Sound","Spider","Creation","Love","Buddha","Quake","Magma","Ghost",
+    "Rubber","Light","Diamond","Eagle","Dark","Sand","Ice","Flame","Spike","Smoke",
+    "Bomb","Spring","Blade","Spin","Rocket"
+}
+
+local fruitNames = {}
+
+for _, fruit in ipairs(baseFruits) do
+    fruitNames[fruit] = true
+    fruitNames[fruit.."-"..fruit] = true
+    fruitNames["Fruit "..fruit.."-"..fruit] = true
+end
+
 local detectedFruits = {}
 
 local function detectFruits()
     for _, v in pairs(game.Workspace:GetChildren()) do
         if v.Name == "Fruit" or v.Name == "Fruits" or v.Name == "fruit" then
-            -- cek nama buah di child (misal v.Name atau atribut lain)
-            local fruitName = v:FindFirstChild("Name") and v.Name or "Unknown"
-            if not detectedFruits[v] then
+            local fruitNameObj = v:FindFirstChild("Name")
+            local fruitName = fruitNameObj and fruitNameObj.Value or v.Name -- fallback ke v.Name
+            if fruitNames[fruitName] and not detectedFruits[v] then
                 detectedFruits[v] = true
                 sendWebhook(fruitName, JobId)
             end
