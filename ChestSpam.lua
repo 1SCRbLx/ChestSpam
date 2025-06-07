@@ -87,18 +87,19 @@ end
 local function sendWebhook(fruitName, jobId)
     local seaName = getSeaName()
     local playerCount = #Players:GetPlayers()
+    local formattedFruitName = "Fruit [ " .. fruitName .. " ]"
 
     local data = {
         username = "🍎 Fruits",
         avatar_url = "https://i.imgur.com/4M34hi2.png",
         embeds = {
             {
-                title = "🍎 Fruits",
+                title = "🍎 Fruits Detected!",
                 color = 0xff0000,
                 fields = {
                     {
                         name = "Spawned Fruit",
-                        value = fruitName,
+                        value = formattedFruitName,
                         inline = false
                     },
                     {
@@ -114,7 +115,8 @@ local function sendWebhook(fruitName, jobId)
                 },
                 footer = {
                     text = "discord.gg/redz-hub"
-                }
+                },
+                timestamp = os.date("!%Y-%m-%dT%TZ")
             }
         }
     }
@@ -128,6 +130,10 @@ local function sendWebhook(fruitName, jobId)
             Headers = {["Content-Type"] = "application/json"},
             Body = jsonData
         })
+    else
+        pcall(function()
+            HttpService:PostAsync(WEBHOOK_URL, jsonData, Enum.HttpContentType.ApplicationJson)
+        end)
     end
 end
 
@@ -140,11 +146,11 @@ local validFruits = {
     Spike = true, Smoke = true, Bomb = true, Spring = true, Blade = true, Spin = true, Rocket = true,
 }
 
-local detectedFruits = {}
+local detectedFruitNames = {}
 
 local function detectFruits()
-    for _, v in pairs(game.Workspace:GetChildren()) do
-        if v.Name == "Fruit" or v.Name == "Fruits" or v.Name == "fruit" then
+    for _, v in pairs(game.Workspace:GetDescendants()) do
+        if v.Name:lower():match("fruit") then
             local fruitName = "Unknown"
             if v:FindFirstChild("Handle") then
                 if v.Handle:FindFirstChild("FruitName") then
@@ -153,13 +159,32 @@ local function detectFruits()
                     fruitName = v.Handle.BillboardGui.TextLabel.Text
                 end
             end
-            if validFruits[fruitName] and not detectedFruits[v] then
-                detectedFruits[v] = true
+
+            fruitName = fruitName:gsub("%s+", "") -- hapus spasi
+
+            -- validFruits dengan key lowercase
+            local validFruitsLower = {}
+            for k,vv in pairs(validFruits) do
+                validFruitsLower[k:lower()] = vv
+            end
+
+            local fruitKey = fruitName:lower() .. "_" .. JobId
+
+            if validFruitsLower[fruitName:lower()] and not detectedFruitNames[fruitKey] then
+                detectedFruitNames[fruitKey] = true
                 sendWebhook(fruitName, JobId)
             end
         end
     end
 end
+
+-- Listen buah baru spawn (spawn/drop)
+game.Workspace.DescendantAdded:Connect(function(descendant)
+    if descendant.Name:lower():match("fruit") then
+        wait(0.5)
+        detectFruits()
+    end
+end)
 
 local function getServer()
     local servers = {}
