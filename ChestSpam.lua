@@ -213,35 +213,65 @@ local function serverHop()
     end
 end
 
+-- Flag loop berjalan
+local farmLoopRunning = false
+local hopLoopRunning = false
+
 ChestFarmBtn.MouseButton1Click:Connect(function()
     autoFarm = not autoFarm
     ChestFarmBtn.Text = "Auto Chest Farm: " .. (autoFarm and "ON" or "OFF")
+    if autoFarm and not farmLoopRunning then
+        farmLoopRunning = true
+        spawn(function()
+            wait(4)
+            while autoFarm do
+                pcall(farmChest)
+                pcall(detectFruits)
+                wait(1)
+            end
+            farmLoopRunning = false
+        end)
+    end
 end)
 
 ServerHopBtn.MouseButton1Click:Connect(function()
     autoHop = not autoHop
     ServerHopBtn.Text = "Auto Server Hop: " .. (autoHop and "ON" or "OFF")
+    if autoHop and not hopLoopRunning then
+        hopLoopRunning = true
+        spawn(function()
+            wait(4)
+            while autoHop do
+                wait(serverHopDelay)
+                pcall(serverHop)
+            end
+            hopLoopRunning = false
+        end)
+    end
 end)
 
+-- Start loop awal jika autoFarm/autoHop aktif saat script dijalankan
 spawn(function()
-    wait(4)  -- delay 4 detik sebelum mulai auto farming
-    while true do
-        if autoFarm then
+    wait(4)
+    if autoFarm and not farmLoopRunning then
+        farmLoopRunning = true
+        while autoFarm do
             pcall(farmChest)
             pcall(detectFruits)
+            wait(1)
         end
-        wait(1)
+        farmLoopRunning = false
     end
 end)
 
 spawn(function()
-    wait(4)  -- delay 4 detik sebelum mulai auto server hop
-    while true do
-        if autoHop then
+    wait(4)
+    if autoHop and not hopLoopRunning then
+        hopLoopRunning = true
+        while autoHop do
             wait(serverHopDelay)
             pcall(serverHop)
-        else
-            wait(1)
         end
+        hopLoopRunning = false
     end
 end)
