@@ -8,7 +8,7 @@ local serverHopDelay = 25
 local PlaceId = game.PlaceId
 local JobId = game.JobId
 
-local WEBHOOK_URL = "https://discordapp.com/api/webhooks/1380694630106140854/rNvNZMpLgKzE2r8AyvqfU7RZpJEMfneC9M25Mvy8VgYqx83ZIb2EyYgj4vDogLNdhvky" -- Ganti dengan webhook kamu
+local WEBHOOK_URL = "https://discordapp.com/api/webhooks/1380694630106140854/rNvNZMpLgKzE2r8AyvqfU7RZpJEMfneC9M25Mvy8VgYqx83ZIb2EyYgj4vDogLNdhvky"
 
 local teamToJoin = "Pirates"
 
@@ -72,10 +72,53 @@ local function farmChest()
     end
 end
 
+local function getSeaName()
+    if PlaceId == 2753915549 then
+        return "Sea1"
+    elseif PlaceId == 4442272183 then
+        return "Sea2"
+    elseif PlaceId == 7449423635 then
+        return "Sea3"
+    else
+        return "Unknown"
+    end
+end
+
 local function sendWebhook(fruitName, jobId)
+    local seaName = getSeaName()
+    local playerCount = #Players:GetPlayers()
+
     local data = {
-        content = "Fruit detected: **"..fruitName.."**\nJob ID: "..jobId
+        username = "🍎 Fruits",
+        avatar_url = "https://i.imgur.com/4M34hi2.png",
+        embeds = {
+            {
+                title = "🍎 Fruits",
+                color = 0xff0000,
+                fields = {
+                    {
+                        name = "Spawned Fruit",
+                        value = fruitName,
+                        inline = false
+                    },
+                    {
+                        name = "Server",
+                        value = "Players: "..playerCount.."/12\nSea: "..seaName,
+                        inline = false
+                    },
+                    {
+                        name = "Job Id",
+                        value = jobId,
+                        inline = false
+                    }
+                },
+                footer = {
+                    text = "discord.gg/redz-hub"
+                }
+            }
+        }
     }
+
     local jsonData = HttpService:JSONEncode(data)
     local req = syn and syn.request or http_request or http.request or request
     if req then
@@ -88,30 +131,29 @@ local function sendWebhook(fruitName, jobId)
     end
 end
 
-local baseFruits = {
-    "Dragon","Kitsune","Yeti","Leopard","Gas","Venom","Spirit","Gravity","Dough",
-    "Shadow","Control","T-Rex","Mammoth","Blizzard","Pain","Rumble","Portal",
-    "Phoenix","Sound","Spider","Creation","Love","Buddha","Quake","Magma","Ghost",
-    "Rubber","Light","Diamond","Eagle","Dark","Sand","Ice","Flame","Spike","Smoke",
-    "Bomb","Spring","Blade","Spin","Rocket"
+local validFruits = {
+    Dragon = true, Kitsune = true, Yeti = true, Leopard = true, Gas = true, Venom = true, Spirit = true,
+    Gravity = true, Dough = true, Shadow = true, Control = true, ["T-Rex"] = true, Mammoth = true,
+    Blizzard = true, Pain = true, Rumble = true, Portal = true, Phoenix = true, Sound = true, Spider = true,
+    Creation = true, Love = true, Buddha = true, Quake = true, Magma = true, Ghost = true, Rubber = true,
+    Light = true, Diamond = true, Eagle = true, Dark = true, Sand = true, Ice = true, Flame = true,
+    Spike = true, Smoke = true, Bomb = true, Spring = true, Blade = true, Spin = true, Rocket = true,
 }
-
-local fruitNames = {}
-
-for _, fruit in ipairs(baseFruits) do
-    fruitNames[fruit] = true
-    fruitNames[fruit.."-"..fruit] = true
-    fruitNames["Fruit "..fruit.."-"..fruit] = true
-end
 
 local detectedFruits = {}
 
 local function detectFruits()
     for _, v in pairs(game.Workspace:GetChildren()) do
         if v.Name == "Fruit" or v.Name == "Fruits" or v.Name == "fruit" then
-            local fruitNameObj = v:FindFirstChild("Name")
-            local fruitName = fruitNameObj and fruitNameObj.Value or v.Name -- fallback ke v.Name
-            if fruitNames[fruitName] and not detectedFruits[v] then
+            local fruitName = "Unknown"
+            if v:FindFirstChild("Handle") then
+                if v.Handle:FindFirstChild("FruitName") then
+                    fruitName = v.Handle.FruitName.Value
+                elseif v.Handle:FindFirstChildWhichIsA("BillboardGui") then
+                    fruitName = v.Handle.BillboardGui.TextLabel.Text
+                end
+            end
+            if validFruits[fruitName] and not detectedFruits[v] then
                 detectedFruits[v] = true
                 sendWebhook(fruitName, JobId)
             end
@@ -161,7 +203,7 @@ spawn(function()
     while true do
         if autoFarm then
             pcall(farmChest)
-            pcall(detectFruits) -- deteksi buah jalan bersamaan farm chest
+            pcall(detectFruits)
         end
         wait(1)
     end
