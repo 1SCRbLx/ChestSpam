@@ -28,13 +28,12 @@ local Frame = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
 local ChestFarmBtn = Instance.new("TextButton")
 local ServerHopBtn = Instance.new("TextButton")
-local WebhookTestBtn = Instance.new("TextButton") -- Tombol baru
 
 ScreenGui.Parent = game.CoreGui
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 Frame.Position = UDim2.new(0, 300, 0, 100)
-Frame.Size = UDim2.new(0, 250, 0, 220)
+Frame.Size = UDim2.new(0, 250, 0, 180)
 Frame.Active = true
 Frame.Draggable = true
 
@@ -63,15 +62,6 @@ ServerHopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ServerHopBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 ServerHopBtn.Font = Enum.Font.SourceSansBold
 ServerHopBtn.TextSize = 18
-
-WebhookTestBtn.Parent = Frame
-WebhookTestBtn.Text = "Send Webhook Test"
-WebhookTestBtn.Size = UDim2.new(0.9, 0, 0, 40)
-WebhookTestBtn.Position = UDim2.new(0.05, 0, 0, 160)
-WebhookTestBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-WebhookTestBtn.BackgroundColor3 = Color3.fromRGB(100, 60, 60)
-WebhookTestBtn.Font = Enum.Font.SourceSansBold
-WebhookTestBtn.TextSize = 18
 
 local function farmChest()
     for _,v in pairs(game.Workspace:GetDescendants()) do
@@ -215,10 +205,6 @@ ServerHopBtn.MouseButton1Click:Connect(function()
             hopLoopRunning = false
         end)
     end
-end)
-
-WebhookTestBtn.MouseButton1Click:Connect(function()
-    sendWebhook("Hello from Send Webhook Test button!")
 end)
 
 -- Start loop awal jika autoFarm/autoHop aktif saat script dijalankan
