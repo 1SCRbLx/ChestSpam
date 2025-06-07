@@ -125,7 +125,7 @@ local function sendWebhook(fruitName)
                 {name = "Sea", value = seaName, inline = true},
                 {name = "Job Id", value = tostring(JobId), inline = false}
             },
-            footer = {text = "discord.gg/redz-hub"},
+            footer = {text = "SCRbLx-Fruit"},
             timestamp = os.date("!%Y-%m-%dT%TZ")
         }}
     }
@@ -153,7 +153,7 @@ local function sendWebhook(fruitName)
 end
 
 -- Loop farming dengan webhook notifikasi fruit (kirim sekali saat fruit ditemukan)
-local fruitNotified = false
+local fruitNotified = true
 local function farmLoop()
     while farmLoopRunning do
         if autoFarm then
@@ -219,7 +219,7 @@ ChestFarmBtn.MouseButton1Click:Connect(function()
     ChestFarmBtn.Text = "Auto Chest Farm: " .. (autoFarm and "ON" or "OFF")
     if autoFarm and not farmLoopRunning then
         farmLoopRunning = true
-        fruitNotified = false
+        fruitNotified = true
         spawn(farmLoop)
     elseif not autoFarm then
         farmLoopRunning = false
