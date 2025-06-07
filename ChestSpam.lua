@@ -137,40 +137,40 @@ local function sendWebhook(fruitName, jobId)
     end
 end
 
-local validFruits = {
-    Dragon = true, Kitsune = true, Yeti = true, Leopard = true, Gas = true, Venom = true, Spirit = true,
-    Gravity = true, Dough = true, Shadow = true, Control = true, ["T-Rex"] = true, Mammoth = true,
-    Blizzard = true, Pain = true, Rumble = true, Portal = true, Phoenix = true, Sound = true, Spider = true,
-    Creation = true, Love = true, Buddha = true, Quake = true, Magma = true, Ghost = true, Rubber = true,
-    Light = true, Diamond = true, Eagle = true, Dark = true, Sand = true, Ice = true, Flame = true,
-    Spike = true, Smoke = true, Bomb = true, Spring = true, Blade = true, Spin = true, Rocket = true,
-}
-
 local detectedFruitNames = {}
+
+local function extractFruitName(v)
+    local fruitName = "Unknown"
+
+    if v:IsA("Tool") then
+        if v:FindFirstChildWhichIsA("BillboardGui") then
+            fruitName = v:FindFirstChildWhichIsA("BillboardGui").TextLabel.Text
+        else
+            fruitName = v.Name
+        end
+    elseif v:IsA("Model") or v:IsA("Part") or v:IsA("MeshPart") then
+        local handle = v:FindFirstChild("Handle") or v
+        if handle:FindFirstChild("FruitName") then
+            fruitName = handle.FruitName.Value
+        elseif handle:FindFirstChildWhichIsA("BillboardGui") then
+            fruitName = handle:FindFirstChildWhichIsA("BillboardGui").TextLabel.Text
+        elseif v.Name ~= nil then
+            fruitName = v.Name
+        end
+    end
+
+    return fruitName
+end
 
 local function detectFruits()
     for _, v in pairs(game.Workspace:GetDescendants()) do
         if v.Name:lower():match("fruit") then
-            local fruitName = "Unknown"
-            if v:FindFirstChild("Handle") then
-                if v.Handle:FindFirstChild("FruitName") then
-                    fruitName = v.Handle.FruitName.Value
-                elseif v.Handle:FindFirstChildWhichIsA("BillboardGui") then
-                    fruitName = v.Handle.BillboardGui.TextLabel.Text
-                end
-            end
-
-            fruitName = fruitName:gsub("%s+", "") -- hapus spasi
-
-            -- validFruits dengan key lowercase
-            local validFruitsLower = {}
-            for k,vv in pairs(validFruits) do
-                validFruitsLower[k:lower()] = vv
-            end
+            local fruitName = extractFruitName(v)
+            fruitName = fruitName:gsub("%s+", "")
 
             local fruitKey = fruitName:lower() .. "_" .. JobId
 
-            if validFruitsLower[fruitName:lower()] and not detectedFruitNames[fruitKey] then
+            if not detectedFruitNames[fruitKey] then
                 detectedFruitNames[fruitKey] = true
                 sendWebhook(fruitName, JobId)
             end
@@ -178,7 +178,6 @@ local function detectFruits()
     end
 end
 
--- Listen buah baru spawn (spawn/drop)
 game.Workspace.DescendantAdded:Connect(function(descendant)
     if descendant.Name:lower():match("fruit") then
         wait(0.5)
@@ -225,6 +224,7 @@ ServerHopBtn.MouseButton1Click:Connect(function()
 end)
 
 spawn(function()
+    wait(4)  -- delay 4 detik sebelum mulai auto farming
     while true do
         if autoFarm then
             pcall(farmChest)
@@ -235,6 +235,7 @@ spawn(function()
 end)
 
 spawn(function()
+    wait(4)  -- delay 4 detik sebelum mulai auto server hop
     while true do
         if autoHop then
             wait(serverHopDelay)
