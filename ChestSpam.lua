@@ -8,7 +8,7 @@ local serverHopDelay = 25
 local PlaceId = game.PlaceId
 local JobId = game.JobId
 
-local WEBHOOK_URL = "https://discordapp.com/api/webhooks/1380694630106140854/rNvNZMpLgKzE2r8AyvqfU7RZpJEMfneC9M25Mvy8VgYqx83ZIb2EyYgj4vDogLNdhvky"
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1380694630106140854/rNvNZMpLgKzE2r8AyvqfU7RZpJEMfneC9M25Mvy8VgYqx83ZIb2EyYgj4vDogLNdhvky"
 
 local teamToJoin = "Pirates"
 
@@ -28,12 +28,13 @@ local Frame = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
 local ChestFarmBtn = Instance.new("TextButton")
 local ServerHopBtn = Instance.new("TextButton")
+local WebhookTestBtn = Instance.new("TextButton") -- Tombol baru
 
 ScreenGui.Parent = game.CoreGui
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 Frame.Position = UDim2.new(0, 300, 0, 100)
-Frame.Size = UDim2.new(0, 250, 0, 180)
+Frame.Size = UDim2.new(0, 250, 0, 220)
 Frame.Active = true
 Frame.Draggable = true
 
@@ -63,6 +64,15 @@ ServerHopBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 ServerHopBtn.Font = Enum.Font.SourceSansBold
 ServerHopBtn.TextSize = 18
 
+WebhookTestBtn.Parent = Frame
+WebhookTestBtn.Text = "Send Webhook Test"
+WebhookTestBtn.Size = UDim2.new(0.9, 0, 0, 40)
+WebhookTestBtn.Position = UDim2.new(0.05, 0, 0, 160)
+WebhookTestBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+WebhookTestBtn.BackgroundColor3 = Color3.fromRGB(100, 60, 60)
+WebhookTestBtn.Font = Enum.Font.SourceSansBold
+WebhookTestBtn.TextSize = 18
+
 local function farmChest()
     for _,v in pairs(game.Workspace:GetDescendants()) do
         if v:IsA("TouchTransmitter") and v.Parent and v.Parent.Name:match("Chest") then
@@ -84,32 +94,31 @@ local function getSeaName()
     end
 end
 
-local function sendWebhook(fruitName, jobId)
+local function sendWebhook(message)
     local seaName = getSeaName()
     local playerCount = #Players:GetPlayers()
-    local formattedFruitName = "Fruit [ " .. fruitName .. " ]"
 
     local data = {
-        username = "🍎 Fruits",
+        username = "📢 Webhook Notification",
         avatar_url = "https://i.imgur.com/4M34hi2.png",
         embeds = {
             {
-                title = "🍎 Fruits Detected!",
+                title = "📢 Webhook Notification",
                 color = 0xff0000,
                 fields = {
                     {
-                        name = "Spawned Fruit",
-                        value = formattedFruitName,
-                        inline = true
+                        name = "Message",
+                        value = message,
+                        inline = false
                     },
                     {
-                        name = "Server",
-                        value = "Players: "..playerCount.."/12\nSea: "..seaName,
+                        name = "Server Info",
+                        value = "Players "..playerCount.."/12\nSea: "..seaName,
                         inline = true
                     },
                     {
                         name = "Job Id",
-                        value = jobId,
+                        value = JobId,
                         inline = true
                     }
                 },
@@ -124,66 +133,25 @@ local function sendWebhook(fruitName, jobId)
     local jsonData = HttpService:JSONEncode(data)
     local req = syn and syn.request or http_request or http.request or request
     if req then
-        req({
+        local response = req({
             Url = WEBHOOK_URL,
             Method = "POST",
             Headers = {["Content-Type"] = "application/json"},
             Body = jsonData
         })
+        if response and response.StatusCode then
+            print("[WEBHOOK] Response StatusCode:", response.StatusCode)
+            print("[WEBHOOK] Response Body:", response.Body)
+        else
+            warn("[WEBHOOK] No response or invalid response!")
+        end
     else
         pcall(function()
             HttpService:PostAsync(WEBHOOK_URL, jsonData, Enum.HttpContentType.ApplicationJson)
+            print("[WEBHOOK] PostAsync sent (no response available)")
         end)
     end
 end
-
-local detectedFruitNames = {}
-
-local function extractFruitName(v)
-    local fruitName = "Unknown"
-
-    if v:IsA("Tool") then
-        if v:FindFirstChildWhichIsA("BillboardGui") then
-            fruitName = v:FindFirstChildWhichIsA("BillboardGui").TextLabel.Text
-        else
-            fruitName = v.Name
-        end
-    elseif v:IsA("Model") or v:IsA("Part") or v:IsA("MeshPart") then
-        local handle = v:FindFirstChild("Handle") or v
-        if handle:FindFirstChild("FruitName") then
-            fruitName = handle.FruitName.Value
-        elseif handle:FindFirstChildWhichIsA("BillboardGui") then
-            fruitName = handle:FindFirstChildWhichIsA("BillboardGui").TextLabel.Text
-        elseif v.Name ~= nil then
-            fruitName = v.Name
-        end
-    end
-
-    return fruitName
-end
-
-local function detectFruits()
-    for _, v in pairs(game.Workspace:GetDescendants()) do
-        if v.Name:lower():match("fruit") then
-            local fruitName = extractFruitName(v)
-            fruitName = fruitName:gsub("%s+", "")
-
-            local fruitKey = fruitName:lower() .. "_" .. JobId
-
-            if not detectedFruitNames[fruitKey] then
-                detectedFruitNames[fruitKey] = true
-                sendWebhook(fruitName, JobId)
-            end
-        end
-    end
-end
-
-game.Workspace.DescendantAdded:Connect(function(descendant)
-    if descendant.Name:lower():match("fruit") then
-        wait(0.5)
-        detectFruits()
-    end
-end)
 
 local function getServer()
     local servers = {}
@@ -226,7 +194,6 @@ ChestFarmBtn.MouseButton1Click:Connect(function()
             wait(4)
             while autoFarm do
                 pcall(farmChest)
-                pcall(detectFruits)
                 wait(1)
             end
             farmLoopRunning = false
@@ -250,6 +217,10 @@ ServerHopBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+WebhookTestBtn.MouseButton1Click:Connect(function()
+    sendWebhook("Hello from Send Webhook Test button!")
+end)
+
 -- Start loop awal jika autoFarm/autoHop aktif saat script dijalankan
 spawn(function()
     wait(4)
@@ -257,7 +228,6 @@ spawn(function()
         farmLoopRunning = true
         while autoFarm do
             pcall(farmChest)
-            pcall(detectFruits)
             wait(1)
         end
         farmLoopRunning = false
