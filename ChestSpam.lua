@@ -3,7 +3,7 @@ local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
 local player = Players.LocalPlayer
 
-local chestFarmDelay = 0.5
+local chestFarmDelay = 0.2
 local serverHopDelay = 25
 local PlaceId = game.PlaceId
 local JobId = game.JobId
@@ -20,8 +20,8 @@ end
 
 joinTeam(teamToJoin)
 
-local autoFarm = true
-local autoHop = true
+local autoFarm = false
+local autoHop = false
 
 local farmLoopRunning = false
 local hopLoopRunning = false
